@@ -1,0 +1,181 @@
+openapi: 3.0.0
+info:
+  title: Transacciones API
+  version: 1.0.0
+  description: API para gestionar las transacciones bancarias del banco XYZ
+paths:
+  /transacciones/deposito:
+    post:
+      summary: Registrar un depósito
+      operationId: registrarDeposito
+      requestBody:
+        description: Datos para registrar un depósito
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+      responses:
+        '201':
+          description: Depósito registrado con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '400':
+          description: Solicitud inválida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /transacciones/retiro:
+    post:
+      summary: Registrar un retiro
+      operationId: registrarRetiro
+      requestBody:
+        description: Datos para registrar un retiro
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+      responses:
+        '201':
+          description: Retiro registrado con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '400':
+          description: Solicitud inválida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Saldo insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /transacciones/transferencia:
+    post:
+      summary: Registrar una transferencia
+      operationId: registrarTransferencia
+      requestBody:
+        description: Datos para registrar una transferencia
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+      responses:
+        '201':
+          description: Transferencia registrada con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '400':
+          description: Solicitud inválida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Saldo insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /transacciones/historial:
+    get:
+      summary: Consultar historial de transacciones
+      operationId: consultarHistorialTransacciones
+      responses:
+        '200':
+          description: Historial de transacciones
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionResponse'
+        '400':
+          description: Solicitud inválida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    TransactionRequest:
+      type: object
+      properties:
+        tipo:
+          type: string
+          enum:
+            - DEPOSITO
+            - RETIRO
+            - TRANSFERENCIA
+          description: Tipo de la transacción
+        monto:
+          type: number
+          format: double
+          description: Monto de la transacción
+        fecha:
+          type: string
+          format: date-time
+          description: Fecha de la transacción
+        cuentaOrigen:
+          type: string
+          description: Número de la cuenta de origen
+        cuentaDestino:
+          type: string
+          description: Número de la cuenta de destino (solo para transferencias)
+      required:
+        - tipo
+        - monto
+        - cuentaOrigen
+
+    TransactionResponse:
+      type: object
+      properties:
+        tipo:
+          type: string
+          enum:
+            - DEPOSITO
+            - RETIRO
+            - TRANSFERENCIA
+          description: Tipo de la transacción
+        monto:
+          type: number
+          format: double
+          description: Monto de la transacción
+        fecha:
+          type: string
+          format: date-time
+          description: Fecha de la transacción
+        cuentaOrigen:
+          type: string
+          description: Número de la cuenta de origen
+        cuentaDestino:
+          type: string
+          description: Número de la cuenta de destino (si aplica)
+
+    ErrorResponse:
+      type: object
+      properties:
+        codigo:
+          type: integer
+          description: Código de error
+        mensaje:
+          type: string
+          description: Mensaje de error
+      required:
+        - codigo
+        - mensaje
